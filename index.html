@@ -1,9 +1,29 @@
 <!DOCTYPE html>
 <style>
+  body {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
   #grid-container {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(16, 40px);
-    grid-template-rows: repeat(16, 40px);
+    justify-content: center;
+    grid-template-columns: repeat(16, 30px);
+    grid-template-rows: repeat(16, 30px);
+  }
+  #newgrid {
+    position: relative;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: inherit;
+    font-family: inherit;
+  }
+  .bzrt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>
 <html>
@@ -11,29 +31,62 @@
     <title>Etch-a-Sketch</title>
   </head>
   <body>
+    <h1 class="bzrt">Etch-a-Sketch!</h1>
     <button id="newgrid">Create New Grid</button>
     <div id="grid-container"></div>
   </body>
 </html>
 <script>
   const container = document.querySelector("#grid-container");
-  const btn = document.querySelector("#newgrid");
-  btn.addEventListener("click", (e) => {
-    let rows = prompt("How many rows?", 16);
-    let columns = prompt("How many columns?", 16);
-    resetBoard(rows, columns);
-  });
-  for (let id = 1; id <= 256; ++id) {
+  let prevArea = 256;
+  let area = 256;
+  for (let id = 1; id <= area; ++id) {
     const div = document.createElement("div");
-    div.classList.add(id);
-    div.textContent = id;
+    div.classList.toggle(id);
+    //div.textContent = id;
     div.style.border = "1px solid black";
     div.addEventListener("mouseover", (e) => {
       changeColor(div);
     });
     container.appendChild(div);
   }
-  function resetBoard(rows, columns) {}
+  const btn = document.querySelector("#newgrid");
+  btn.addEventListener("click", (e) => {
+    let rows = prompt("How many rows?");
+    let columns = prompt("How many columns?");
+    resetBoard(rows, columns);
+  });
+  function resetBoard(rows, columns) {
+    prevArea = area;
+    area = rows * columns;
+    //console.log(prevArea + " " + area);
+    container.style.gridTemplateColumns =
+      "repeat(" + columns + ", " + 480 / columns + "px)";
+    container.style.gridTemplateRows =
+      "repeat(" + rows + ", " + 480 / rows + "px)";
+    if (area > prevArea) {
+      for (let id = prevArea + 1; id <= area; ++id) {
+        const div = document.createElement("div");
+        //console.log(div);
+        div.classList.toggle(id);
+        //div.textContent = id;
+        div.style.border = "1px solid black";
+        div.addEventListener("mouseover", (e) => {
+          changeColor(div);
+        });
+        container.appendChild(div);
+      }
+    } else {
+      for (let id = area + 1; id <= prevArea; ++id) {
+        container.lastElementChild.remove();
+      }
+    }
+    let div = container.firstElementChild;
+    for (let id = 1; id <= area; ++id) {
+      div.style.backgroundColor = "rgb(255, 255, 255)";
+      div = div.nextSibling;
+    }
+  }
 
   function changeColor(div) {
     let x = Math.floor(Math.random() * 256);
